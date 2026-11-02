@@ -1,5 +1,7 @@
 # iQOO Neo8 BL 解锁工具（V2301A / PD2301）
 
+作者：酷安@TNTHe
+
 ![Platform](https://img.shields.io/badge/platform-Windows-0078D6)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1-5391FE)
 ![Device](https://img.shields.io/badge/device-iQOO%20Neo8-00A98F)
