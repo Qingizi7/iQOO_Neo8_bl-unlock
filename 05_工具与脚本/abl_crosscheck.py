@@ -1,39 +1,31 @@
-import re, sys
+import struct, re, sys
 from capstone import Cs, CS_ARCH_ARM64, CS_MODE_ARM, CS_OP_IMM, CS_OP_REG, CS_OP_MEM
 
-from abl_common import parse_pe, text_section, file_to_va
-
 P = sys.argv[1] if len(sys.argv) > 1 else 'abl_payload.bin'
-try:
-    d = open(P, 'rb').read()
-except OSError as e:
-    print('error: %s' % e, file=sys.stderr)
-    sys.exit(2)
+d = open(P, 'rb').read()
+MOD = 0xb8
+pe = MOD + struct.unpack('<I', d[MOD + 0x3c:MOD + 0x40])[0]
+optsz = struct.unpack('<H', d[pe + 20:pe + 22])[0]
+base = struct.unpack('<I', d[pe + 24 + 28:pe + 24 + 32])[0]
+nsec = struct.unpack('<H', d[pe + 6:pe + 8])[0]
+secs = []
+for i in range(nsec):
+    o = pe + 24 + optsz + i * 40
+    vs, va, rs, pr = struct.unpack('<IIII', d[o + 8:o + 24])
+    secs.append((base + va, rs, MOD + pr))
 
-try:
-    info = parse_pe(d)
-    text = text_section(d, info)
-except ValueError as e:
-    print('error: %s' % e, file=sys.stderr)
-    sys.exit(2)
-TEXT_VA = text['va']
-TEXT_SIZE = text['size']
-TEXT_OFF = text['offset']
-
-print('payload: %s' % P)
-print('PE: mz=0x%x pe=0x%x image_base=0x%x' % (info['mz'], info['pe'], info['image_base']))
-print('TEXT: off=0x%x va=0x%x size=0x%x' % (TEXT_OFF, TEXT_VA, TEXT_SIZE))
-
+TEXT_VA, TEXT_SIZE, TEXT_OFF = 0x1000, 0x95000, MOD + 0x10b8
 md = Cs(CS_ARCH_ARM64, CS_MODE_ARM)
 md.detail = True
 insns = list(md.disasm(d[TEXT_OFF:TEXT_OFF + TEXT_SIZE], TEXT_VA))
 
-
 def f2va(fo):
-    return file_to_va(info, fo)
+    for va, rs, pr in secs:
+        if pr <= fo < pr + rs:
+            return va + (fo - pr)
+    return None
 
-
-print('\n--- strings containing unlock / verifiedboot / device_state ---')
+print('--- strings containing unlock / verifiedboot / device_state ---')
 targets = {}
 for m in re.finditer(rb'[ -~]{5,}', d):
     s = m.group().decode('latin1')
@@ -47,11 +39,10 @@ print('\n--- xrefs and context ---')
 page = {}
 xrefs = []
 for ins in insns:
-    m = ins.mnemonic
-    ops = ins.operands
+    m = ins.mnemonic; ops = ins.operands
     if m == 'adrp' and len(ops) == 2 and ops[0].type == CS_OP_REG and ops[1].type == CS_OP_IMM:
         page[ops[0].reg] = ops[1].imm
-    elif m in ('add', 'sub') and len(ops) == 3 and ops[0].type == CS_OP_REG and ops[1].type == CS_OP_REG and ops[2].type == CS_OP_IMM and ops[1].reg in page:
+    elif m in ('add', 'sub') and len(ops) == 3 and ops[1].type == CS_OP_REG and ops[2].type == CS_OP_IMM and ops[1].reg in page:
         t = page[ops[1].reg] + (ops[2].imm if m == 'add' else -ops[2].imm)
         if t in targets:
             xrefs.append((ins.address, t))

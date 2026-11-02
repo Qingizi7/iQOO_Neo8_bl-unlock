@@ -12,7 +12,3 @@
 # 镜像与日志
 *.img
 *.log
-
-# Python
-__pycache__/
-*.pyc

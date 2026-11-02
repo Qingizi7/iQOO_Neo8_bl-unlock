@@ -138,9 +138,6 @@ ABL 把 BL 锁状态存放在独立的 4KB `devinfo` 分区：
 │     ├─ Neo8BL.ps1            # 备份/写入/验证主逻辑
 │     └─ platform-tools/       # 建议作为 Release 附件，不建议直接入库
 ├─ 05_工具与脚本/
-│  ├─ README.md                # 脚本依赖与用法
-│  ├─ requirements.txt         # capstone
-│  ├─ abl_common.py            # PE 解析公共模块
 │  ├─ abl_flags.py             # ABL 标志位分析（可选）
 │  ├─ abl_xref.py              # ABL 交叉引用（可选）
 │  └─ abl_crosscheck.py        # ABL 复核（可选）
@@ -148,8 +145,6 @@ ABL 把 BL 锁状态存放在独立的 4KB `devinfo` 分区：
 ```
 
 `platform-tools` 是 Google 的 ADB/fastboot 二进制。为避免仓库体积和许可问题，建议通过 GitHub Release 附件分发，或让使用者从官方页面下载后放到 `04_Neo8方案/工具/platform-tools/`。
-
-ABL 分析脚本需要 `capstone`，且需要传入已经解出的 `abl_payload.bin`（不是 `abl_a.img` 本身）；依赖、提取和用法见 [`05_工具与脚本/README.md`](05_工具与脚本/README.md)。
 
 ---
 
