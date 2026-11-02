@@ -10,7 +10,8 @@ $script:LastCase = $null
 $script:Utf8 = New-Object System.Text.UTF8Encoding($false)
 $script:Profile = @{
     Model = 'V2301A'; Device = 'PD2301'
-    Firmware = 'PD2301_A_16.3.17.0.W10'
+    # 允许 PD2301 后带一个字母的固件变体，例如 PD2301E_A_16.3.17.0.W10。
+    FirmwarePattern = '^PD2301[A-Z]?_A_16\.3\.17\.0\.W10$'
     Kernel = '5.10.246-gki-g8c3d0d7851ff'
     # Neo8 本机没有可用的外部参考哈希：机型/固件/内核/槽位/尺寸与 devinfo 结构作为前置条件，
     # 各分区哈希只做“本次备份与实际分区一致”的自校验，不套用其他设备的镜像指纹。
@@ -166,8 +167,11 @@ function Get-Identity([string]$Serial) {
 }
 
 function Assert-Profile($Identity, [switch]$ForUnlock) {
-    foreach ($key in @('Model', 'Device', 'Firmware', 'Kernel')) {
-        if ($Identity.$key -cne $script:Profile[$key]) { throw "不支持的 $key：$($Identity.$key)。仅支持本机实测的 Neo8 固件与内核。" }
+    foreach ($key in @('Model', 'Device', 'Kernel')) {
+        if ($Identity.$key -cne $script:Profile[$key]) { throw "不支持的 $key：$($Identity.$key)。仅支持本机实测的 Neo8 机型与内核。" }
+    }
+    if ($Identity.Firmware -cnotmatch $script:Profile.FirmwarePattern) {
+        throw "不支持的 Firmware：$($Identity.Firmware)。仅支持 PD2301[_字母]_A_16.3.17.0.W10（型号后缀允许一个字母）。"
     }
     if ($Identity.Slot -notin @('_a', '_b')) { throw "分区槽位异常：$($Identity.Slot)。必须为 _a 或 _b。" }
     if ($ForUnlock) {
@@ -242,7 +246,7 @@ function New-Backup($Identity) {
     if ($drive.AvailableFreeSpace -lt 512MB) { throw '工具所在磁盘可用空间不足 512MB，请先腾出空间。' }
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
     $case = [pscustomobject]@{
-        ToolVersion = '1.0-neo8'; Identity = $Identity; Directory = $directory
+        ToolVersion = '1.1-neo8'; Identity = $Identity; Directory = $directory
         Remote = '/data/local/tmp/neo8bl-' + [Guid]::NewGuid().ToString('N')
         State = 'created'; Updated = ''; Partitions = [ordered]@{}
     }
@@ -289,7 +293,7 @@ function Confirm-Unlock([string]$Serial) {
     Say '========== 写入前的风险提示 ==========' Yellow
     Say '1. 这是非官方解锁。操作失败可能无法启动，备份不保证一定能救回。' Yellow
     Say '2. 参考实测案例清空了全部用户数据。请先另行备份照片、聊天和账号恢复信息。' Yellow
-    Say '3. 仅支持 V2301A / PD2301 的 PD2301_A_16.3.17.0.W10；其他固件会直接拒绝执行。' Yellow
+    Say '3. 仅支持 V2301A / PD2301 的 PD2301[_字母]_A_16.3.17.0.W10；其他固件会直接拒绝执行。' Yellow
     Say '4. 写入内容仅为 devinfo 的 0x0D/0x0E 两个字节，不改动其他分区。' Yellow
     Say '5. 写入期间不要拔线、关闭窗口或重启。工具不提供回锁，也不会刷其他人的镜像。' Yellow
     Say ('目标手机序列号：' + $Serial) Cyan
@@ -391,7 +395,7 @@ function Reboot-AndVerify($Case) {
 
 function Show-Risks {
     Say '流程：取得临时 Root → 授权 Shell → 检测环境 → 自动备份 → 确认风险 → 解锁与验证 → 按手机提示完成后续设置。'
-    Say '支持：V2301A / PD2301，PD2301_A_16.3.17.0.W10，5.10.246-gki-g8c3d0d7851ff（A/B，自动识别槽位）。'
+    Say '支持：V2301A / PD2301，PD2301[_字母]_A_16.3.17.0.W10，5.10.246-gki-g8c3d0d7851ff（A/B，自动识别槽位）。'
     Say '工具锁定机型、固件、内核、槽位和分区尺寸；本机无外部参考哈希，不套用其他设备的镜像指纹。'
     Say '风险：清空数据、账号需重新登录、启动失败；备份不是一定可用的救砖保证。' Yellow
     Say '已解锁设备禁止重复解锁。本工具不负责临时提权，不自动清除数据，不自动安装永久 Root。'
@@ -404,7 +408,7 @@ function Start-Neo8Tool {
     $logs = Join-Path $script:ToolRoot '运行记录'
     New-Item -ItemType Directory -Path $logs -Force | Out-Null
     $script:LogPath = Join-Path $logs ((Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8) + '.log')
-    Say 'iQOO Neo8 BL 工具（V2301A / PD2301）v1.0'
+    Say 'iQOO Neo8 BL 工具（V2301A / PD2301）v1.1'
     Say '请先取得临时 Root 后再使用；解锁有清空数据及无法启动风险，请先阅读使用说明。' Yellow
     Find-Tools
     while ($true) {

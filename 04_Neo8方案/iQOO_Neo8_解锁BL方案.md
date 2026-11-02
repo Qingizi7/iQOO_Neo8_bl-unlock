@@ -8,7 +8,7 @@
 | --- | --- |
 | 型号 | `V2301A` |
 | 设备代号 | `PD2301` |
-| 固件 | `PD2301_A_16.3.17.0.W10` |
+| 固件 | `PD2301[_字母]_A_16.3.17.0.W10`（本机参考 `PD2301_A_16.3.17.0.W10`） |
 | 内核 | `5.10.246-gki-g8c3d0d7851ff` |
 | 平台 | `taro`（骁龙 8+ 降频版） |
 | 分区布局 | A/B（`boot_a/b`、`abl_a/b`、`vbmeta_a/b`、`xbl_a/b`、`uefi_a/b`） |
@@ -16,6 +16,8 @@
 | 前提 | 已取得临时 Root，且 Shell / UID 2000 可用 `su` |
 
 **本机没有 `init_boot` 分区。** init ramdisk 位于 `boot_a`（boot 镜像 v4）。
+
+> 固件名允许在 `PD2301` 后带一个字母，例如 `PD2301E_A_16.3.17.0.W10`。本方案只在本机 `PD2301_A_16.3.17.0.W10` 上实测；字母后缀变体只做了适配放行，未在第二台设备验证。
 
 ## 1. 原理
 
@@ -60,7 +62,7 @@ ABL 把 BL 锁状态存放在独立的 4KB `devinfo` 分区：
 ```text
 adb shell getprop ro.product.model                 # V2301A
 adb shell getprop ro.product.device                # PD2301
-adb shell getprop ro.build.display.id              # PD2301_A_16.3.17.0.W10
+adb shell getprop ro.build.display.id              # PD2301[_字母]_A_16.3.17.0.W10
 adb shell uname -r                                 # 5.10.246-gki-g8c3d0d7851ff
 adb shell getprop ro.boot.slot_suffix              # _a 或 _b
 adb shell getprop ro.boot.flash.locked             # 1
@@ -174,7 +176,7 @@ adb shell getprop ro.boot.verifiedbootstate   # orange
 
 与参考工具的区别：
 
-- 已锁定为 `V2301A / PD2301`、`PD2301_A_16.3.17.0.W10`、`5.10.246-gki-g8c3d0d7851ff`。
+- 已锁定为 `V2301A / PD2301`、`PD2301[_字母]_A_16.3.17.0.W10`、`5.10.246-gki-g8c3d0d7851ff`。
 - 自动识别 `_a/_b` 槽位，按槽位备份 `boot/abl/vbmeta/xbl/uefi`。
 - 没有外部参考哈希可用，因此不比较其他设备的 abl/xbl/uefi 指纹；改为锁定机型/固件/内核/槽位/尺寸、devinfo 结构，并在本次备份内自校验。不要为了“通过”而删除这些检查。
 - 候选生成函数已用本机原始 devinfo 做过离线校验（结果哈希与实机候选一致）；**完整自动写入流程没有在第二台锁定 Neo8 上实测**，本机解锁使用的是上文手动流程。
