@@ -73,7 +73,6 @@
 ├─ docs/
 │  ├─ neo8-unlock-guide.md      # 完整操作流程
 │  ├─ principle.md              # devinfo / ABL / AVB 原理与证据
-│  ├─ verification.md           # 两台独立设备的验证状态
 │  ├─ recovery.md               # 救砖与回退
 │  └─ troubleshooting.md        # 常见报错
 ├─ neo8/
@@ -125,7 +124,6 @@ adb shell getprop ro.boot.verifiedbootstate   # orange
 | --- | --- |
 | [`docs/neo8-unlock-guide.md`](docs/neo8-unlock-guide.md) | 支持范围、手动流程、自动化菜单、永久 Root |
 | [`docs/principle.md`](docs/principle.md) | 启动链、devinfo 结构、ABL 读取路径、`secure` 与 `unlocked` 的区别、数据清空原因 |
-| [`docs/verification.md`](docs/verification.md) | 参考机与第二台独立设备的成功报告、已验证/未验证边界 |
 | [`docs/recovery.md`](docs/recovery.md) | fastboot / recovery / 9008 / 售后救砖与回退 |
 | [`docs/troubleshooting.md`](docs/troubleshooting.md) | `adb pull` 路径错误、固件识别、Root、fastboot 等常见问题 |
 

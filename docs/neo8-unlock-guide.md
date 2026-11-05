@@ -1,7 +1,7 @@
 # iQOO Neo8 解锁操作指南
 
 > 适用：iQOO Neo8 `V2301A / PD2301`，固件 `PD2301[_字母]_A_16.3.17.0.W10`，内核 `5.10.246-gki-g8c3d0d7851ff`，A/B 分区。  
-> 原理和证据见 [`principle.md`](principle.md)；验证记录见 [`verification.md`](verification.md)；救砖见 [`recovery.md`](recovery.md)。
+> 原理和证据见 [`principle.md`](principle.md)；救砖见 [`recovery.md`](recovery.md)。
 
 ## 1. 适用范围
 
@@ -229,6 +229,5 @@ adb shell "su -c id"
 ## 8. 相关文档
 
 - [`principle.md`](principle.md)：devinfo/ABL/AVB 原理与证据。
-- [`verification.md`](verification.md)：两台设备的验证状态。
 - [`recovery.md`](recovery.md)：救砖与回退。
 - [`troubleshooting.md`](troubleshooting.md)：常见报错。

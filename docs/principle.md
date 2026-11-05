@@ -1,7 +1,7 @@
 # iQOO Neo8 解锁原理详解
 
 > 本文解释 `devinfo` 状态位方案为什么能让 ABL 返回 `unlocked: yes`，以及它为什么不是官方/硬件级解锁。  
-> 适用机型、固件和操作步骤见 [`neo8-unlock-guide.md`](neo8-unlock-guide.md)；验证记录见 [`verification.md`](verification.md)。
+> 适用机型、固件和操作步骤见 [`neo8-unlock-guide.md`](neo8-unlock-guide.md)。
 
 ## 1. 一句话结论
 
@@ -151,7 +151,7 @@ ro.boot.verifiedbootstate   = orange
 3. 写入后回读 4096 字节，逐字节等于候选。
 4. `fastboot getvar unlocked` 返回独立行 `unlocked: yes`；`secure: yes` 可同时存在。
 5. 清数据后系统正常启动，Android 属性为 `0 / unlocked / orange`。
-6. 第二台独立设备的成功报告见 [`verification.md`](verification.md)。
+6. 仓库 README 记录了两台独立设备的成功报告；第二台未公开完整日志。
 
 ## 12. 复现分析（可选）
 
