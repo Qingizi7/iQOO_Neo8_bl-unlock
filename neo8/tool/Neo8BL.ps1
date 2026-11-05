@@ -241,7 +241,7 @@ function Save-Case($Case, [string]$State) {
 
 function New-Backup($Identity) {
     $id = (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8)
-    $directory = Join-Path (Join-Path (Join-Path $script:ToolRoot '备份') $Identity.Serial) $id
+    $directory = Join-Path (Join-Path (Join-Path $script:ToolRoot 'backups') $Identity.Serial) $id
     $drive = New-Object IO.DriveInfo([IO.Path]::GetPathRoot($script:ToolRoot))
     if ($drive.AvailableFreeSpace -lt 512MB) { throw '工具所在磁盘可用空间不足 512MB，请先腾出空间。' }
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
@@ -400,12 +400,12 @@ function Show-Risks {
     Say '风险：清空数据、账号需重新登录、启动失败；备份不是一定可用的救砖保证。' Yellow
     Say '已解锁设备禁止重复解锁。本工具不负责临时提权，不自动清除数据，不自动安装永久 Root。'
     Say '永久 Root 请按对应项目的官方说明另行安装，使用目标设备当前固件的原始启动镜像制作补丁。'
-    Say '备份在本目录的“备份/序列号/时间”下；日志在“运行记录”。含设备信息，请勿直接公开整个目录。'
+    Say '备份在本目录的 “backups/<serial>/<time>” 下；日志在 “logs”。含设备信息，请勿直接公开整个目录。'
 }
 
 function Start-Neo8Tool {
     [Console]::OutputEncoding = New-Object Text.UTF8Encoding($false)
-    $logs = Join-Path $script:ToolRoot '运行记录'
+    $logs = Join-Path $script:ToolRoot 'logs'
     New-Item -ItemType Directory -Path $logs -Force | Out-Null
     $script:LogPath = Join-Path $logs ((Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8) + '.log')
     Say 'iQOO Neo8 BL 工具（V2301A / PD2301）v1.1'

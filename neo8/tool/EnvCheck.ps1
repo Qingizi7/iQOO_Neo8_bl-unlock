@@ -122,7 +122,7 @@ function Check-Connections([bool]$AdbReady, [bool]$FastbootReady) {
 
 function Start-EnvironmentCheck {
     [Console]::OutputEncoding = New-Object Text.UTF8Encoding($false)
-    $directory = Join-Path $script:ToolRoot '环境检测报告'
+    $directory = Join-Path $script:ToolRoot 'env-report'
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
     $stem = (Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8)
     $script:LogPath = Join-Path $directory ($stem + '.commands.log')

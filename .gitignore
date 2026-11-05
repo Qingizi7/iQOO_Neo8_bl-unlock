@@ -1,14 +1,18 @@
-# 设备证据、个人备份和运行产物，不要提交
-01_解锁证据/
-02_Root补丁/
-03_原厂分区备份/
-04_Neo8方案/工具/备份/
-04_Neo8方案/工具/运行记录/
-04_Neo8方案/工具/环境检测报告/
+# Device evidence, personal backups, and runtime output
+evidence/
+root-patch/
+stock-backups/
+neo8/tool/backups/
+neo8/tool/logs/
+neo8/tool/env-report/
 
-# 第三方 platform-tools 二进制，建议作为 Release 附件
-04_Neo8方案/工具/platform-tools/
+# Third-party platform-tools binaries; prefer Release assets
+neo8/tool/platform-tools/
 
-# 镜像与日志
+# Images and logs
 *.img
 *.log
+
+# Python
+__pycache__/
+*.pyc
