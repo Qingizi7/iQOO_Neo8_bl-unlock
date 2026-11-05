@@ -5,7 +5,6 @@
 ![Platform](https://img.shields.io/badge/platform-Windows-0078D6)
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1-5391FE)
 ![Device](https://img.shields.io/badge/device-iQOO%20Neo8-00A98F)
-![Status](https://img.shields.io/badge/status-2%20independent%20reports-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 
 通过临时 Root 改写 `devinfo` 分区里的锁状态字节，让 ABL 在下次启动时按“已解锁”处理。
