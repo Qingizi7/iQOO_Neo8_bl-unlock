@@ -87,3 +87,18 @@ neo8/tool/env-report/                 # 环境检测报告
 ```
 
 这些目录可能包含设备序列号和本机分区，分享前先脱敏，不要直接公开整个目录。
+
+## 10. 推送候选时报 `remote couldn't create file: Permission denied`
+
+典型报错：
+
+```text
+adb: error: failed to copy '.../devinfo-unlocked-candidate.img'
+to '/data/local/tmp/neo8bl-.../candidate.img': remote couldn't create file: Permission denied
+```
+
+原因不是手机 Root 没给，而是旧版工具用 `su -c` 创建 `/data/local/tmp/neo8bl-...` 并设置 `755`，目录归 root 所有；`adb push` 是**以 shell 用户运行**的，不经过 `su`，所以 shell 没有写权限。
+
+v1.2 已改为用 `adb shell mkdir` 创建临时目录，让目录归 shell 所有；root 的 `dd` 仍能写入，后续 `adb push` 也能写。请替换 `neo8/tool/Neo8BL.ps1` 后重新跑菜单 `3`。
+
+这次失败发生在备份完成、写入 `devinfo` 之前；手机没有被写入，备份仍然有效。重新执行会创建新备份，不需要手动还原。

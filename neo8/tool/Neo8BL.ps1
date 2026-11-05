@@ -246,13 +246,17 @@ function New-Backup($Identity) {
     if ($drive.AvailableFreeSpace -lt 512MB) { throw '工具所在磁盘可用空间不足 512MB，请先腾出空间。' }
     New-Item -ItemType Directory -Path $directory -Force | Out-Null
     $case = [pscustomobject]@{
-        ToolVersion = '1.1-neo8'; Identity = $Identity; Directory = $directory
+        ToolVersion = '1.2-neo8'; Identity = $Identity; Directory = $directory
         Remote = '/data/local/tmp/neo8bl-' + [Guid]::NewGuid().ToString('N')
         State = 'created'; Updated = ''; Partitions = [ordered]@{}
     }
     $script:LastCase = $case
     Save-Case $case 'backing_up'
-    $null = Invoke-Root $Identity.Serial "mkdir -p $($case.Remote) && chmod 755 $($case.Remote)"
+    # Create the remote directory as shell, so the later `adb push` (which runs
+    # as shell, not through su) can write the candidate file. Root `dd` can
+    # still write into a shell-owned directory.
+    $created = Invoke-Adb $Identity.Serial @('shell', "mkdir -p $($case.Remote) && chmod 755 $($case.Remote)")
+    Require-OK $created '创建手机临时目录失败'
     foreach ($partition in $script:Profile.Partitions.Keys) {
         Say ('备份 ' + $partition + ' ……')
         $source = if ($partition -ceq 'devinfo') { '/dev/block/by-name/devinfo' } else { '/dev/block/by-name/' + $partition + $Identity.Slot }
@@ -408,7 +412,7 @@ function Start-Neo8Tool {
     $logs = Join-Path $script:ToolRoot 'logs'
     New-Item -ItemType Directory -Path $logs -Force | Out-Null
     $script:LogPath = Join-Path $logs ((Get-Date -Format 'yyyyMMdd-HHmmss') + '-' + [Guid]::NewGuid().ToString('N').Substring(0, 8) + '.log')
-    Say 'iQOO Neo8 BL 工具（V2301A / PD2301）v1.1'
+    Say 'iQOO Neo8 BL 工具（V2301A / PD2301）v1.2'
     Say '请先取得临时 Root 后再使用；解锁有清空数据及无法启动风险，请先阅读使用说明。' Yellow
     Find-Tools
     while ($true) {
