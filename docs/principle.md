@@ -138,8 +138,6 @@ ro.boot.verifiedbootstate   = orange
 - **不是官方解锁令牌流程**：没有走 `fastboot flashing unlock`，没有厂商解锁令牌。
 - **不是熔丝级解锁**：从可写 `devinfo` 生效来看，这条路径没有依赖一次性熔丝；也没有证据表明烧了熔丝。
 - **不是关闭 secure boot**：`secure: yes` 仍在。
-- **不是永久 Root**：临时 Root 重启后消失；永久 Root 需要另行补丁 `boot` / `init_boot`。
-- **不等于能随便刷机**：工具只验证到 `unlocked: yes`，没有刷入未签名/第三方镜像，也没有验证 GSI、AVB 或 vivo 私有校验是否放行。
 - **只对匹配的固件布局可靠**：`devinfo` 结构、ABL 逻辑和分区尺寸随固件变化；工具会检查机型、内核、槽位、尺寸和 `devinfo` 结构，不匹配就拒绝。
 
 ## 11. 证据链
