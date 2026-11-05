@@ -81,14 +81,14 @@
 │     ├─ env-check.bat          # 只读环境检测
 │     ├─ Neo8BL.ps1             # 备份/写入/验证主逻辑
 │     ├─ EnvCheck.ps1           # 只读检测脚本
-│     └─ platform-tools/        # 自行下载，建议作为 Release 附件
+│     └─ platform-tools/        # 自行下载
 └─ scripts/
    ├─ abl_flags.py              # ABL 标志位分析（可选）
    ├─ abl_xref.py               # ABL 交叉引用（可选）
    └─ abl_crosscheck.py         # ABL 复核（可选）
 ```
 
-`platform-tools` 是 Google 的 ADB/fastboot 二进制。为避免仓库体积和许可问题，建议通过 GitHub Release 附件分发，或从官方页面下载后放到 `neo8/tool/platform-tools/`。
+`platform-tools` 是 Google 的 ADB/fastboot 二进制。为避免仓库体积和许可问题，建议从官方页面下载后放到 `neo8/tool/platform-tools/`。
 
 ## Quick start
 
